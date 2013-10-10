@@ -111,12 +111,12 @@ def initialize_system():
         sys.exit('Please re-run the script with root user')
 
     execute("apt-get clean" , True)
-    execute("apt-get autoclean -y" , True)
-    execute("apt-get update -y" , True)
-    execute("apt-get install ubuntu-cloud-keyring python-setuptools python-iniparse python-psutil -y", True)
+    execute("apt-get autoclean -y --force-yes" , True)
+    execute("apt-get update -y --force-yes" , True)
+    execute("apt-get install ubuntu-cloud-keyring python-setuptools python-iniparse python-psutil -y --force-yes", True)
     delete_file("/etc/apt/sources.list.d/grizzly.list")
     execute("echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main >> /etc/apt/sources.list.d/grizzly.list")
-    execute("apt-get update -y", True)
+    execute("apt-get update -y --force-yes", True)
 
     global iniparse
     if iniparse is None:
@@ -132,14 +132,14 @@ def initialize_system():
 ip_address = get_ip_address("eth0")
 
 def install_rabbitmq():
-    execute("apt-get install rabbitmq-server -y", True)
+    execute("apt-get install rabbitmq-server -y --force-yes", True)
     execute("service rabbitmq-server restart", True)
     time.sleep(2)
 
 
 def install_database():
     os.environ['DEBIAN_FRONTEND'] = 'noninteractive'
-    execute("apt-get install mysql-server python-mysqldb mysql-client-5.5 -y", True)
+    execute("apt-get install mysql-server python-mysqldb mysql-client-5.5 -y --force-yes", True)
     execute("sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf")
     execute("service mysql restart", True)
     time.sleep(2)
@@ -211,7 +211,7 @@ def install_and_configure_keystone():
     execute_db_commnads("GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY 'keystone';")
     execute_db_commnads("GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY 'keystone';")
 
-    execute("apt-get install keystone -y", True)
+    execute("apt-get install keystone -y --force-yes", True)
 
 
     add_to_conf(keystone_conf, "DEFAULT", "admin_token", "ADMINTOKEN")
@@ -239,7 +239,7 @@ def install_and_configure_glance():
     execute_db_commnads("GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'glance';")
     execute_db_commnads("GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'glance';")
 
-    execute("apt-get install glance -y", True)
+    execute("apt-get install glance -y --force-yes", True)
 
 
     add_to_conf(glance_api_paste_conf, "filter:authtoken", "auth_host", "127.0.0.1")
@@ -287,8 +287,8 @@ def install_and_configure_nova():
     execute_db_commnads("GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'nova';")
     execute_db_commnads("GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'nova';")
 
-    execute("apt-get install kvm libvirt-bin -y")
-    execute("apt-get install nova-api nova-cert nova-scheduler nova-conductor nova-compute-kvm novnc nova-consoleauth nova-novncproxy -y", True)
+    execute("apt-get install kvm libvirt-bin -y --force-yes")
+    execute("apt-get install nova-api nova-cert nova-scheduler nova-conductor nova-compute-kvm novnc nova-consoleauth nova-novncproxy -y --force-yes", True)
 
 
     add_to_conf(nova_paste_conf, "filter:authtoken", "auth_host", "127.0.0.1")
@@ -356,7 +356,7 @@ def install_and_configure_quantum():
     execute_db_commnads("GRANT ALL PRIVILEGES ON quantum.* TO 'quantum'@'%' IDENTIFIED BY 'quantum';")
     execute_db_commnads("GRANT ALL PRIVILEGES ON quantum.* TO 'quantum'@'localhost' IDENTIFIED BY 'quantum';")
 
-    execute("apt-get install quantum-server quantum-plugin-linuxbridge quantum-plugin-linuxbridge-agent quantum-dhcp-agent -y", True)
+    execute("apt-get install quantum-server quantum-plugin-linuxbridge quantum-plugin-linuxbridge-agent quantum-dhcp-agent -y --force-yes", True)
 
     add_to_conf(quantum_conf, "DEFAULT", "core_plugin", "quantum.plugins.linuxbridge.lb_quantum_plugin.LinuxBridgePluginV2")
     add_to_conf(quantum_conf, "DEFAULT", "verbose", "true")
@@ -397,7 +397,7 @@ def install_and_configure_quantum():
 
 
 def install_and_configure_dashboard():
-    execute("apt-get install openstack-dashboard -y", True)
+    execute("apt-get install openstack-dashboard -y --force-yes", True)
     execute("service apache2 restart", True)
 
 initialize_system()
